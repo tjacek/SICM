@@ -1,5 +1,7 @@
 import numpy as np
 from scipy import interpolate
+from mpl_toolkits import mplot3d
+import matplotlib.pyplot as plt
 
 class Path(object):
     def __init__(self, values,bounds=(0,1)):
@@ -18,36 +20,41 @@ class Path(object):
     def __call__(self,t):
         return np.array([ s_i(t) for s_i in self.splines])
 
-#class Path(object):
-#    def __init__(self,points,bounds=(0,1)):
-#        if(type(points)==tuple):
-#            points=np.random.rand(*points)
-#        self.points=points
-#        self.bounds=bounds
-    
-#    def __len__(self):
-#        return len(self.points)	
+    def whole(self,step=0.01):
+        return np.array([self(t) for t in self.time(step)])
 
-#    def __call__(self,t):
-#        if(t<self.bounds[0] or t>self.bounds[1]):
-#            t=self.bounds[0]
-#        return self.points[int(len(self)*t)]
+    def time(self,step=0.01):
+    	diff=self.bounds[1]-self.bounds[0]
+    	n=int(diff/step)
+    	return [ self.bounds[0]+i*step for i in range(n)]
 
-#    def whole(self,step=0.01):
-#        return [self(t) for t in self.time(step)]
+class Lagrangian(object):
+    def __init__(self,fun=None):
+        if(fun is None):
+            fun=free_particle
+        self.fun=fun
 
-#    def time(self,step=0.01):
-#    	diff=self.bounds[1]-self.bounds[0]
-#    	n=int(diff/step)
-#    	return [ self.bounds[0]+i*step for i in range(n)]
-
-def get_v(state):
-	return state[3:]
+    def __call__(self,path,step=0.01):
+        values=path.whole(step)
+        return np.sum([ self.fun(value_i) 
+        	  for value_i in values])
 
 def free_particle(state):
-	return 0,5*get_v(state)**2
+    v=state[3:]
+    return 0.5*np.dot(v,v)
 
-path=Path((7,6))
-print(path(0.5))
+def plot(path:Path,step=0.01):
+    ax = plt.axes(projection='3d')
+    data= path.whole(step)
+    xline=data[:,0]
+    yline=data[:,1]
+    zline=data[:,1]
+    ax.plot3D(xline, yline, zline, 'gray')
+    plt.show()
+
+L=Lagrangian()
+
+path=Path((6,7))
+print(L(path))
 #state=np,array([1,2,3,4,5,6])
 #print(free_particle(state))
