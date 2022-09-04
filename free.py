@@ -2,6 +2,7 @@ import numpy as np
 from scipy import interpolate
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
+from scipy.optimize import differential_evolution
 
 class Path(object):
     def __init__(self, values,bounds=(0,1)):
@@ -52,9 +53,21 @@ def plot(path:Path,step=0.01):
     ax.plot3D(xline, yline, zline, 'gray')
     plt.show()
 
+def optim(L,n_cand=5,n_points=7,maxiter=10):
+    path=Path((6,n_points))
+    init=np.random.uniform(0,1,(n_cand,6*n_points))
+#    raise Exception(init.shape)
+    def loss_fun(x):
+        x=np.reshape(x,(6,n_points))
+        return x[0][0]
+#        raise Exception(x.shape)	
+    bound_w = [(-10, 10)  for _ in range(6*n_points)]
+    result = differential_evolution(loss_fun, bound_w, 
+            init=init,
+            maxiter=maxiter, tol=1e-7)
+    return result['x']
+
 L=Lagrangian()
 
-path=Path((6,7))
-print(L(path))
-#state=np,array([1,2,3,4,5,6])
-#print(free_particle(state))
+x=optim(L)
+print(x)
