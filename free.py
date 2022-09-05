@@ -12,14 +12,22 @@ class Path(object):
         self.bounds=bounds
         self.values=values
         self.points=np.arange(self.bounds[0],self.bounds[1],step)
-        self.splines=self.interpolate()
+        self.interpolate()
 
     def interpolate(self):
-        return [ interpolate.InterpolatedUnivariateSpline(self.points,y_i)
-                    for y_i in self.values]
+        self.splines=[ interpolate.InterpolatedUnivariateSpline(self.points,y_i)
+                            for y_i in self.values]
+        self.dervatives=[spline_i.derivative() 
+                for spline_i in self.splines]
 
     def __call__(self,t):
+        return np.concatenate([self.q(t),self.v(t)])
+
+    def q(self,t):
         return np.array([ s_i(t) for s_i in self.splines])
+
+    def v(self,t):    	
+        return np.array([ d_i(t) for d_i in self.dervatives])
 
     def whole(self,step=0.01):
         return np.array([self(t) for t in self.time(step)])
@@ -29,16 +37,16 @@ class Path(object):
     	n=int(diff/step)
     	return [ self.bounds[0]+i*step for i in range(n)]
 
-class Lagrangian(object):
-    def __init__(self,fun=None):
-        if(fun is None):
-            fun=free_particle
-        self.fun=fun
+#class Lagrangian(object):
+#    def __init__(self,fun=None):
+#        if(fun is None):
+#            fun=free_particle
+#        self.fun=fun
 
-    def __call__(self,path,step=0.01):
-        values=path.whole(step)
-        return np.sum([ self.fun(value_i) 
-        	  for value_i in values])
+#    def __call__(self,path,step=0.01):
+#        values=path.whole(step)
+#        return np.sum([ self.fun(value_i) 
+#        	  for value_i in values])
 
 def free_particle(state):
     v=state[3:]
@@ -53,21 +61,20 @@ def plot(path:Path,step=0.01):
     ax.plot3D(xline, yline, zline, 'gray')
     plt.show()
 
-def optim(L,n_cand=5,n_points=7,maxiter=10):
-    path=Path((6,n_points))
-    init=np.random.uniform(0,1,(n_cand,6*n_points))
-#    raise Exception(init.shape)
-    def loss_fun(x):
-        x=np.reshape(x,(6,n_points))
-        return x[0][0]
-#        raise Exception(x.shape)	
-    bound_w = [(-10, 10)  for _ in range(6*n_points)]
-    result = differential_evolution(loss_fun, bound_w, 
-            init=init,
-            maxiter=maxiter, tol=1e-7)
-    return result['x']
+#def optim(L,n_cand=5,n_points=7,maxiter=10):
+#    path=Path((6,n_points))
+#    init=np.random.uniform(0,1,(n_cand,6*n_points))
+#    def loss_fun(x):
+#        x=np.reshape(x,(6,n_points))
+#        return x[0][0]
+#    bound_w = [(-10, 10)  for _ in range(6*n_points)]
+#    result = differential_evolution(loss_fun, bound_w, 
+#            init=init,
+#            maxiter=maxiter, tol=1e-7)
+#    return result['x']
 
-L=Lagrangian()
-
-x=optim(L)
-print(x)
+#L=Lagrangian()
+#x=optim(L)
+#print(x)
+path=Path((3,10))
+print(path(0.5))
