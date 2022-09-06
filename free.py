@@ -5,18 +5,26 @@ import matplotlib.pyplot as plt
 from scipy.optimize import differential_evolution
 
 class Path(object):
-    def __init__(self, values,bounds=(0,1)):
-        if(type(values)==tuple):
-            values=np.random.rand(*values)
-        step= (bounds[1]-bounds[0])/values.shape[1]
+    def __init__(self, values,start=None,end=None,bounds=(0,1)):
+        if(type(values)==int):
+            values=np.random.rand(*(3,values))
+        if(start is None):
+            start=np.random.rand(3)
+        if(end is None):
+            end=np.random.rand(3)
+        step= (bounds[1]-bounds[0])/(values.shape[1]+2)
         self.bounds=bounds
+        self.start=start
+        self.end=end
         self.values=values
         self.points=np.arange(self.bounds[0],self.bounds[1],step)
         self.interpolate()
 
     def interpolate(self):
+        values=[self.start] + list(self.values.T) + [self.end]
+        values=np.array(values).T
         self.splines=[ interpolate.InterpolatedUnivariateSpline(self.points,y_i)
-                            for y_i in self.values]
+                            for y_i in values]
         self.dervatives=[spline_i.derivative() 
                 for spline_i in self.splines]
 
@@ -37,16 +45,16 @@ class Path(object):
     	n=int(diff/step)
     	return [ self.bounds[0]+i*step for i in range(n)]
 
-#class Lagrangian(object):
-#    def __init__(self,fun=None):
-#        if(fun is None):
-#            fun=free_particle
-#        self.fun=fun
+class Lagrangian(object):
+    def __init__(self,fun=None):
+        if(fun is None):
+            fun=free_particle
+        self.fun=fun
 
-#    def __call__(self,path,step=0.01):
-#        values=path.whole(step)
-#        return np.sum([ self.fun(value_i) 
-#        	  for value_i in values])
+    def __call__(self,path,step=0.01):
+        values=path.whole(step)
+        return np.sum([ self.fun(value_i) 
+        	  for value_i in values])
 
 def free_particle(state):
     v=state[3:]
@@ -61,20 +69,22 @@ def plot(path:Path,step=0.01):
     ax.plot3D(xline, yline, zline, 'gray')
     plt.show()
 
-#def optim(L,n_cand=5,n_points=7,maxiter=10):
-#    path=Path((6,n_points))
-#    init=np.random.uniform(0,1,(n_cand,6*n_points))
-#    def loss_fun(x):
-#        x=np.reshape(x,(6,n_points))
-#        return x[0][0]
-#    bound_w = [(-10, 10)  for _ in range(6*n_points)]
-#    result = differential_evolution(loss_fun, bound_w, 
-#            init=init,
-#            maxiter=maxiter, tol=1e-7)
-#    return result['x']
+def optim(L,start,end,
+	    n_cand=5,n_points=7,maxiter=10):
+    path=Path(n_points,start,end)
+    init=np.random.uniform(0,1,(n_cand,3*n_points))
+    def loss_fun(x):
+        x=np.reshape(x,(3,n_points))
+        return x[0][0]
+    bound_w = [(-10, 10)  for _ in range(3*n_points)]
+    result = differential_evolution(loss_fun, bound_w, 
+            init=init,
+            maxiter=maxiter, tol=1e-7)
+    return result['x']
 
-#L=Lagrangian()
-#x=optim(L)
-#print(x)
-path=Path((3,10))
-print(path(0.5))
+L=Lagrangian()
+x=optim(L,start=[0,0,0],end=[1,1,1])
+print(x)
+#path=Path(10,start=[0,0,0],end=[1,1,1])
+#plot(path)
+#print(path(0.5))
