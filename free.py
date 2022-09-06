@@ -27,6 +27,10 @@ class Path(object):
                             for y_i in values]
         self.dervatives=[spline_i.derivative() 
                 for spline_i in self.splines]
+    
+    def reset(self,values):
+        self.values=values
+        self.interpolate()
 
     def __call__(self,t):
         return np.concatenate([self.q(t),self.v(t)])
@@ -75,16 +79,19 @@ def optim(L,start,end,
     init=np.random.uniform(0,1,(n_cand,3*n_points))
     def loss_fun(x):
         x=np.reshape(x,(3,n_points))
-        return x[0][0]
+        path.reset(x)
+        value=L(path)
+        print(value)
+        return value#x[0][0]
     bound_w = [(-10, 10)  for _ in range(3*n_points)]
     result = differential_evolution(loss_fun, bound_w, 
             init=init,
             maxiter=maxiter, tol=1e-7)
-    return result['x']
+    return path#result['x']
 
 L=Lagrangian()
-x=optim(L,start=[0,0,0],end=[1,1,1])
-print(x)
+path=optim(L,start=[0,0,0],end=[1,1,1])
+plot(path)
 #path=Path(10,start=[0,0,0],end=[1,1,1])
 #plot(path)
 #print(path(0.5))
