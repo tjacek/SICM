@@ -49,17 +49,22 @@ class Path(object):
     	n=int(diff/step)
     	return [ self.bounds[0]+i*step for i in range(n)]
 
-class Lagrangian(object):
-    def __init__(self,fun=None):
-        if(fun is None):
-            fun=free_particle
-        self.fun=fun
+#class Lagrangian(object):
+#    def __init__(self,fun=None):
+#        if(fun is None):
+#            fun=free_particle
+#        self.fun=fun
 
-    def __call__(self,path,step=0.01):
-        values=path.whole(step)
-        return np.sum([ self.fun(value_i) 
-        	  for value_i in values])
+def Langrange(step=0.01):
+    def decor_fun(fun):
+        def helper(path):
+            values=path.whole(step)
+            return np.sum([fun(value_i) 
+        	          for value_i in values])
+        return helper
+    return decor_fun 
 
+@Langrange(step=0.01)
 def free_particle(state):
     v=state[3:]
     return 0.5*np.dot(v,v)
@@ -89,8 +94,8 @@ def optim(L,start,end,
             maxiter=maxiter, tol=1e-7)
     return path#result['x']
 
-L=Lagrangian()
-path=optim(L,start=[0,0,0],end=[1,1,1])
+#L=Lagrangian()
+path=optim(free_particle,start=[0,0,0],end=[1,1,1])
 plot(path)
 #path=Path(10,start=[0,0,0],end=[1,1,1])
 #plot(path)
