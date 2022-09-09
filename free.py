@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from scipy.optimize import differential_evolution
 
 class Path(object):
-    def __init__(self, values,start=None,end=None,bounds=(0,1)):
+    def __init__(self, values,start=None,end=None,
+    	    bounds=(0,1),dim=3):
         if(type(values)==int):
             values=np.random.rand(*(3,values))
         if(start is None):
@@ -19,6 +20,7 @@ class Path(object):
         self.values=values
         self.points=np.arange(self.bounds[0],self.bounds[1],step)
         self.interpolate()
+        self.dim=dim
 
     def interpolate(self):
         values=[self.start] + list(self.values.T) + [self.end]
@@ -33,7 +35,7 @@ class Path(object):
         self.interpolate()
 
     def __call__(self,t):
-        return np.concatenate([self.q(t),self.v(t)])
+        return (self.q(t),self.v(t))
 
     def q(self,t):
         return np.array([ s_i(t) for s_i in self.splines])
@@ -42,7 +44,10 @@ class Path(object):
         return np.array([ d_i(t) for d_i in self.dervatives])
 
     def whole(self,step=0.01):
-        return np.array([self(t) for t in self.time(step)])
+    	values=[]
+    	for t in self.time(step):
+    	    values.append(self(t))
+    	return values
 
     def time(self,step=0.01):
     	diff=self.bounds[1]-self.bounds[0]
@@ -53,44 +58,43 @@ def Langrange(step=0.01):
     def decor_fun(fun):
         def helper(path):
             values=path.whole(step)
-            return np.sum([fun(value_i) 
+            return np.sum([fun(*value_i) 
         	          for value_i in values])
         return helper
     return decor_fun 
 
 @Langrange(step=0.01)
-def free_particle(state):
-    v=state[3:]
+def free_particle(q,v):
     return 0.5*np.dot(v,v)
 
 @Langrange(step=0.01)
-def harmonic(state,k=0.3):
-    q,v=state[:3],state[3:]
+def harmonic(q,v,k=1.0):
     return 0.5*(np.dot(v,v) - k*np.dot(q,q))
 
 def plot(path:Path,step=0.01):
     ax = plt.axes(projection='3d')
-    data= path.whole(step)
-    xline=data[:,0]
-    yline=data[:,1]
-    zline=data[:,1]
+    q,v= zip(*path.whole(step))
+    q=np.array(q)
+    plot3D(q)
+    
+def plot3D(q):
+    xline,yline,zline=q[:,0],q[:,1],q[:,2]
     ax.plot3D(xline, yline, zline, 'gray')
     plt.show()
 
-def optim(L,start,end,
-	    n_cand=5,n_points=7,maxiter=10):
+def optim(L,start,end,n_cand=5,
+	  n_points=7,maxiter=10,dims=3):
     path=Path(n_points,start,end)
-    init=np.random.uniform(0,1,(n_cand,3*n_points))
+    init=np.random.uniform(0,1,(n_cand,dims*n_points))
     def loss_fun(x):
-        x=np.reshape(x,(3,n_points))
+        x=np.reshape(x,(dims,n_points))
         path.reset(x)
         value=L(path)
         print(value)
-        return value#x[0][0]
-    bound_w = [(-10, 10)  for _ in range(3*n_points)]
+        return value
+    bound_w = [(-10, 10)  for _ in range(dims*n_points)]
     result = differential_evolution(loss_fun, bound_w, 
-            init=init,
-            maxiter=maxiter, tol=1e-7)
+            init=init,maxiter=maxiter, tol=1e-7)
     return path
 
 #L=Lagrangian()
