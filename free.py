@@ -6,13 +6,13 @@ from scipy.optimize import differential_evolution
 
 class Path(object):
     def __init__(self, values,start=None,end=None,
-    	    bounds=(0,1),dim=3):
+    	    bounds=(0,1),dims=3):
         if(type(values)==int):
-            values=np.random.rand(*(3,values))
+            values=np.random.rand(*(dims,values))
         if(start is None):
-            start=np.random.rand(3)
+            start=np.random.rand(dims)
         if(end is None):
-            end=np.random.rand(3)
+            end=np.random.rand(dims)
         step= (bounds[1]-bounds[0])/(values.shape[1]+2)
         self.bounds=bounds
         self.start=start
@@ -20,7 +20,7 @@ class Path(object):
         self.values=values
         self.points=np.arange(self.bounds[0],self.bounds[1],step)
         self.interpolate()
-        self.dim=dim
+        self.dims=dims
 
     def interpolate(self):
         values=[self.start] + list(self.values.T) + [self.end]
@@ -72,19 +72,27 @@ def harmonic(q,v,k=1.0):
     return 0.5*(np.dot(v,v) - k*np.dot(q,q))
 
 def plot(path:Path,step=0.01):
-    ax = plt.axes(projection='3d')
     q,v= zip(*path.whole(step))
     q=np.array(q)
-    plot3D(q)
-    
+    if(path.dims==3):
+        plot3D(q)
+    else:
+    	plot2D(q)
+
 def plot3D(q):
+    ax = plt.axes(projection='3d')
     xline,yline,zline=q[:,0],q[:,1],q[:,2]
     ax.plot3D(xline, yline, zline, 'gray')
     plt.show()
 
+def plot2D(q):
+    x,y=q[:,0],q[:,1]
+    plt.plot(x, y) 
+    plt.show()	
+
 def optim(L,start,end,n_cand=5,
 	  n_points=7,maxiter=10,dims=3):
-    path=Path(n_points,start,end)
+    path=Path(n_points,start,end,dims=dims)
     init=np.random.uniform(0,1,(n_cand,dims*n_points))
     def loss_fun(x):
         x=np.reshape(x,(dims,n_points))
@@ -98,7 +106,8 @@ def optim(L,start,end,n_cand=5,
     return path
 
 #L=Lagrangian()
-path=optim(harmonic,start=[0,0,0],end=[0,0,1])
+path=optim(harmonic,start=[0,0],
+    end=[0,1],dims=2)
 plot(path)
 #path=Path(10,start=[0,0,0],end=[1,1,1])
 #plot(path)
