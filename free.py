@@ -54,22 +54,41 @@ class Path(object):
     	n=int(diff/step)
     	return [ self.bounds[0]+i*step for i in range(n)]
 
-def Langrange(step=0.01):
-    def decor_fun(fun):
-        def helper(path):
-            values=path.whole(step)
-            return np.sum([fun(*value_i) 
-        	          for value_i in values])
-        return helper
-    return decor_fun 
+class Langrange(object):
+    def __init__(self,fun):
+        self.fun=fun
 
-@Langrange(step=0.01)
-def free_particle(q,v):
-    return 0.5*np.dot(v,v)
+    def __call__(self,path,step=0.01):
+        values=path.whole(step)
+        return np.sum([self.fun(*value_i) 
+        	          for value_i in values])         	
 
-@Langrange(step=0.01)
-def harmonic(q,v,k=1.0):
-    return 0.5*(np.dot(v,v) - k*np.dot(q,q))
+#def Langrange(step=0.01):
+#    def decor_fun(fun):
+#        def helper(path):
+#            values=path.whole(step)
+#            return np.sum([fun(*value_i) 
+#        	          for value_i in values])
+#        return helper
+#    return decor_fun 
+
+#@Langrange(step=0.01)
+#def free_particle(q,v):
+#    return 0.5*np.dot(v,v)
+
+
+class Harmonic(object):
+    def __init__(self,k=1):
+        self.k=k 
+
+    def __call__(self,q,v):
+        return 0.5*(np.dot(v,v) - self.k*np.dot(q,q))
+
+    def diff_q(self,q,v):
+    	return np.sum(q)
+    
+    def diff_v(self,q,v):
+    	return np.sum(v)
 
 def plot(path:Path,step=0.01):
     q,v= zip(*path.whole(step))
@@ -105,9 +124,9 @@ def optim(L,start,end,n_cand=5,
             init=init,maxiter=maxiter, tol=1e-7)
     return path
 
-#L=Lagrangian()
-path=optim(harmonic,start=[0,0],
-    end=[0,1],dims=2)
+L=Langrange(Harmonic())
+path=optim(L,start=[0,0],
+    end=[6.28,0],dims=2,n_points=10)
 plot(path)
 #path=Path(10,start=[0,0,0],end=[1,1,1])
 #plot(path)
