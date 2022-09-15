@@ -63,6 +63,18 @@ class Langrange(object):
         return np.sum([self.fun(*value_i) 
         	          for value_i in values])         	
 
+def EulerVerify(L,path,step=0.01):
+    if(type(L)==Langrange):
+        L=L.fun
+    values=path.whole(step)
+    d_q=[L.diff_q(*value_i) 
+        for value_i in values]
+    d_v=[L.diff_v(*value_i) 
+        for value_i in values]
+    d_t=np.diff(d_v,prepend=d_v[-1])
+    print(np.sum(d_q-d_t))
+#    print(d_t)
+
 #def Langrange(step=0.01):
 #    def decor_fun(fun):
 #        def helper(path):
@@ -127,7 +139,5 @@ def optim(L,start,end,n_cand=5,
 L=Langrange(Harmonic())
 path=optim(L,start=[0,0],
     end=[6.28,0],dims=2,n_points=10)
-plot(path)
-#path=Path(10,start=[0,0,0],end=[1,1,1])
 #plot(path)
-#print(path(0.5))
+EulerVerify(L,path)
