@@ -2,7 +2,8 @@ import numpy as np
 from scipy import interpolate
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
-from scipy.optimize import differential_evolution
+from scipy.optimize import differential_evolution,minimize
+import langr
 
 class Path(object):
     def __init__(self, values,start=None,end=None,
@@ -52,19 +53,10 @@ class Path(object):
     def time(self,step=0.01):
     	diff=self.bounds[1]-self.bounds[0]
     	n=int(diff/step)
-    	return [ self.bounds[0]+i*step for i in range(n)]
-
-class Langrange(object):
-    def __init__(self,fun):
-        self.fun=fun
-
-    def __call__(self,path,step=0.01):
-        values=path.whole(step)
-        return np.sum([self.fun(*value_i) 
-        	          for value_i in values])         	
+    	return [ self.bounds[0]+i*step for i in range(n)]       	
 
 def EulerVerify(L,path,step=0.01):
-    if(type(L)==Langrange):
+    if(type(L)==langr.Langrange):
         L=L.fun
     values=path.whole(step)
     d_q=[L.diff_q(*value_i) 
@@ -73,34 +65,6 @@ def EulerVerify(L,path,step=0.01):
         for value_i in values]
     d_t=np.diff(d_v,prepend=d_v[-1])
     print(np.sum(d_q-d_t))
-#    print(d_t)
-
-#def Langrange(step=0.01):
-#    def decor_fun(fun):
-#        def helper(path):
-#            values=path.whole(step)
-#            return np.sum([fun(*value_i) 
-#        	          for value_i in values])
-#        return helper
-#    return decor_fun 
-
-#@Langrange(step=0.01)
-#def free_particle(q,v):
-#    return 0.5*np.dot(v,v)
-
-
-class Harmonic(object):
-    def __init__(self,k=1):
-        self.k=k 
-
-    def __call__(self,q,v):
-        return 0.5*(np.dot(v,v) - self.k*np.dot(q,q))
-
-    def diff_q(self,q,v):
-    	return np.sum(q)
-    
-    def diff_v(self,q,v):
-    	return np.sum(v)
 
 def plot(path:Path,step=0.01):
     q,v= zip(*path.whole(step))
@@ -121,8 +85,10 @@ def plot2D(q):
     plt.plot(x, y) 
     plt.show()	
 
-def optim(L,start,end,n_cand=5,
+def optim_evol(L,start,end,n_cand=5,
 	  n_points=7,maxiter=10,dims=3):
+    if(type(L)!=langr.Langrange):
+        L=langr.Langrange(L)
     path=Path(n_points,start,end,dims=dims)
     init=np.random.uniform(0,1,(n_cand,dims*n_points))
     def loss_fun(x):
@@ -136,8 +102,24 @@ def optim(L,start,end,n_cand=5,
             init=init,maxiter=maxiter, tol=1e-7)
     return path
 
-L=Langrange(Harmonic())
+def optim(L,start,end,n_cand=5,
+	  n_points=7,maxiter=10,dims=3):
+    if(type(L)!=langr.Langrange):
+        L=langr.Langrange(L)
+    path=Path(n_points,start,end,dims=dims)
+    init=np.random.uniform(0,1,(dims*n_points))
+    def loss_fun(x):
+        x=np.reshape(x,(dims,n_points))
+        path.reset(x)
+        value=L(path)
+        print(value)
+        return value
+    result=minimize(loss_fun, init, method='Nelder-Mead')
+#             args=params,options=myopts)
+    return path
+
+L= langr.Free()#Langrange(Free())
 path=optim(L,start=[0,0],
-    end=[6.28,0],dims=2,n_points=10)
-#plot(path)
+    end=[1,1],dims=2,n_points=10)
+plot(path)
 EulerVerify(L,path)
