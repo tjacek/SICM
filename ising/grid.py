@@ -5,6 +5,13 @@ class Grid(object):
         self.height=height
         self.width=width
         self.array=np.ones((height,width))
+    
+    def randomize(self):
+    	for i in range(self.height):
+    		for j in range(self.width):
+    			p=np.random.uniform(low=0.0, high=1.0)
+    			if(p<0.5):
+    				self.array[i][j]=-1
 
     def get_near(self,pair):
         i,j=pair
@@ -33,5 +40,6 @@ class Grid(object):
         return near
 
 grid=Grid()
+grid.randomize()
 print(grid.array)
-print(grid.get_near((0,0)))
+#print(grid.get_near((0,0)))
