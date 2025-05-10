@@ -2,19 +2,10 @@ import pygame as pg
 import numpy as np
 
 class GridView(object):
-    def __init__(self,grid,step=50):
+    def __init__(self,grid,cells,step=50):
         self.grid=grid
         self.step=step
-        heigh,width=self.grid.shape
-        self.cells=[]
-        for i in range(heigh):
-            self.cells.append([])
-            for j in range(width):
-                color= int(((i+j) % 3)==0)
-                cell_ij=make_cell(i,j,
-                                 step=self.step,
-                                 color=color)
-                self.cells[i].append(cell_ij)
+        self.cells=cells
 
     def show(self,window):
         for i,cell_i in enumerate(self.cells):
@@ -31,6 +22,10 @@ class GridView(object):
         i,j=self.get_cord(point)
         old_value=self.grid[i][j]
         self.grid[i][j]= (old_value+1)%2
+
+    def display_dim(self):
+        height,width=self.grid.shape
+        return self.step*height,self.step*width
 
 class Cell(object):
     def __init__(self,rect,color=(255,0,0)):
@@ -53,10 +48,27 @@ def make_cell(i,j,step=50,color=False):
     rect=pg.Rect(x,y,step,step)
     return Cell(rect,color)
 
+def init_cells(height,width,step):
+    cells=[]
+    for i in range(height):
+        cells.append([])
+        for j in range(width):
+            color= int(((i+j) % 3)==0)
+            cell_ij=make_cell(i,j,
+                              step=step,
+                              color=color)
+            cells[i].append(cell_ij)
+    return cells
+
+def make_grid_view(arr,step=50):
+    height,width=arr.shape
+    return GridView(grid=arr,
+                    cells=init_cells(height,width,step),
+                    step=step)
 pg.init()
-window = pg.display.set_mode((1000, 1000))
+grid_view = make_grid_view(np.ones((10,10)))
+window = pg.display.set_mode(grid_view.display_dim())
 clock = pg.time.Clock()
-input_box = GridView(np.ones((10,10)))
 run = True
 while run:
     for event in pg.event.get():
@@ -64,9 +76,9 @@ while run:
             run = False
         if event.type == pg.MOUSEBUTTONUP:
                 point = pg.mouse.get_pos()
-                input_box.flip(point)
+                grid_view.flip(point)
                 print(point)
-    input_box.show(window)
+    grid_view.show(window)
     pg.display.flip()
     clock.tick(3)
 
