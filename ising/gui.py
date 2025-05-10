@@ -1,4 +1,5 @@
 import pygame as pg
+import json
 import numpy as np
 
 class GridView(object):
@@ -65,22 +66,34 @@ def make_grid_view(arr,step=50):
     return GridView(grid=arr,
                     cells=init_cells(height,width,step),
                     step=step)
-pg.init()
-grid_view = make_grid_view(np.ones((10,10)))
-window = pg.display.set_mode(grid_view.display_dim())
-clock = pg.time.Clock()
-run = True
-while run:
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            run = False
-        if event.type == pg.MOUSEBUTTONUP:
+
+def read_json(in_path):
+    with open(in_path, 'r') as file:
+        data = json.load(file)
+        return data
+
+
+
+def exp_loop(in_path:str):
+    conf=read_json(in_path)
+    pg.init()
+    arr=np.ones((conf["height"],conf['width']))
+    grid_view = make_grid_view(arr,step=conf['step'])
+    window = pg.display.set_mode(grid_view.display_dim())
+    clock = pg.time.Clock()
+    run = True
+    while run:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                run = False
+            if event.type == pg.MOUSEBUTTONUP:
                 point = pg.mouse.get_pos()
                 grid_view.flip(point)
                 print(point)
-    grid_view.show(window)
-    pg.display.flip()
-    clock.tick(3)
+        grid_view.show(window)
+        pg.display.flip()
+        clock.tick(3)
+    pg.quit()
+    exit()
 
-pg.quit()
-exit()
+exp_loop("conf.js")
