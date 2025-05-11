@@ -1,6 +1,8 @@
 import pygame as pg
 import json
 import numpy as np
+from enum import Enum
+import grid
 
 class GridView(object):
     def __init__(self,grid,cells,step=50):
@@ -11,7 +13,7 @@ class GridView(object):
     def show(self,window):
         for i,cell_i in enumerate(self.cells):
             for j,cell_j in enumerate(cell_i):
-                value_ij=self.grid[i][j]
+                value_ij=(self.grid.array[i][j]<0)
                 cell_j.show(window,color=value_ij)
 
     def get_cord(self,point):
@@ -21,49 +23,49 @@ class GridView(object):
 
     def flip(self,point):
         i,j=self.get_cord(point)
-        old_value=self.grid[i][j]
-        self.grid[i][j]= (old_value+1)%2
+        self.grid.array[i][j]*=(-1) 
 
     def display_dim(self):
-        height,width=self.grid.shape
+        height,width=self.grid.height,self.grid.width
         return self.step*height,self.step*width
 
+class CellColors(Enum):
+    live=(0,128,0)
+    dead=(128,0,0)
+
 class Cell(object):
-    def __init__(self,rect,color=(255,0,0)):
+    def __init__(self,rect):
         self.rect=rect
-        self.color=color
 
     def show(self,window,color):
         if(color):
-            color=(0,128,0)
+            color=CellColors.live 
         else:
-            color=(128,0,0)
-        pg.draw.rect(window, color, self.rect)
+            color=CellColors.dead 
+        pg.draw.rect(window,color.value,self.rect)
 
-def make_cell(i,j,step=50,color=False):
-    if(color):
-        color=(0,128,0)
-    else:
-        color=(128,0,0)
+def make_cell(i,j,step=50):
     x,y=i*step+i,j*step+j
     rect=pg.Rect(x,y,step,step)
-    return Cell(rect,color)
+    return Cell(rect)
 
 def init_cells(height,width,step):
     cells=[]
     for i in range(height):
         cells.append([])
         for j in range(width):
-            color= int(((i+j) % 3)==0)
             cell_ij=make_cell(i,j,
-                              step=step,
-                              color=color)
+                              step=step)
             cells[i].append(cell_ij)
     return cells
 
-def make_grid_view(arr,step=50):
-    height,width=arr.shape
-    return GridView(grid=arr,
+def make_grid_view(height,
+                   width,
+                   step=50):
+    raw_grid=grid.Grid(height=height,
+                       width=width)
+    raw_grid.randomize()
+    return GridView(grid=raw_grid,
                     cells=init_cells(height,width,step),
                     step=step)
 
@@ -72,13 +74,12 @@ def read_json(in_path):
         data = json.load(file)
         return data
 
-
-
 def exp_loop(in_path:str):
     conf=read_json(in_path)
     pg.init()
-    arr=np.ones((conf["height"],conf['width']))
-    grid_view = make_grid_view(arr,step=conf['step'])
+    grid_view = make_grid_view(height=conf["height"],
+                               width=conf["width"],
+                               step=conf['step'])
     window = pg.display.set_mode(grid_view.display_dim())
     clock = pg.time.Clock()
     run = True
