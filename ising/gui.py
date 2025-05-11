@@ -25,6 +25,10 @@ class GridView(object):
         i,j=self.get_cord(point)
         self.grid.array[i][j]*=(-1) 
 
+    def flip_near(self,near):
+        for i,j in near:
+            self.grid.array[i][j]*=(-1)
+
     def display_dim(self):
         height,width=self.grid.height,self.grid.width
         return self.step*height,self.step*width
@@ -90,7 +94,10 @@ def exp_loop(in_path:str):
             if event.type == pg.MOUSEBUTTONUP:
                 point = pg.mouse.get_pos()
                 grid_view.flip(point)
+                pair=grid_view.get_cord(point)
                 print(point)
+                near=grid_view.grid.get_near(pair)
+                grid_view.flip_near(near)
         grid_view.show(window)
         pg.display.flip()
         clock.tick(3)

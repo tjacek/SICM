@@ -14,32 +14,27 @@ class Grid(object):
     				self.array[i][j]=-1
 
     def get_near(self,pair):
-        i,j=pair
-        if( (i<0 or self.height<i) or 
-            (j<0 or self.width<j)):
-        	return None
+        x,y=pair
         near=[]
-        x_lower,x_upper=(0<i),i<(self.height-1)
-        y_lower,y_upper=(0<j),j<(self.width-1)
-        if(x_lower):
-            near.append((i-1,j))
-        if(x_upper):
-            near.append((i+1,j))        	
-        if(y_lower):
-            near.append((i,j-1))
-        if(y_upper):
-            near.append((i,j+1))
-        if(x_lower and y_lower):
-            near.append((i-1,j-1))
-        if(x_upper and y_upper):
-            near.append((i+1,j+1))        
-        if(x_lower and y_upper):
-            near.append((i-1,j+1))
-        if(x_upper and y_lower):
-            near.append((i+1,j-1))
+        for x_i in get_cord(x,self.height-1):
+            for y_i in get_cord(y,self.width-1):
+                near.append((x_i,y_i))
         return near
 
-grid=Grid()
-grid.randomize()
-print(grid.array)
+def get_cord(x,max_value):
+    cord=[x]
+    if(x<=0):
+        cord.append(max_value)
+    else:
+        cord.append(x-1)
+    if(x>=max_value):
+        cord.append(0)
+    else:
+        cord.append(x+1)
+    return cord
+
+if __name__ == '__main__':
+    grid=Grid()
+    grid.randomize()
+    print(grid.array)
 #print(grid.get_near((0,0)))
