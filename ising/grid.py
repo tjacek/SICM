@@ -13,6 +13,10 @@ class Grid(object):
     			if(p<0.5):
     				self.array[i][j]=-1
 
+    def get_near_values(self,pair):
+        return [self.array[x][y] 
+            for x,y in self.get_near(pair)]
+
     def get_near(self,pair):
         x,y=pair
         near=[]
@@ -20,6 +24,11 @@ class Grid(object):
             for y_i in get_cord(y,self.width-1):
                 near.append((x_i,y_i))
         return near
+
+    def random(self):
+        x=np.random.randint(low=self.height,high=None)
+        y=np.random.randint(low=self.width,high=None)
+        return x,y
 
 def get_cord(x,max_value):
     cord=[x]
@@ -37,4 +46,3 @@ if __name__ == '__main__':
     grid=Grid()
     grid.randomize()
     print(grid.array)
-#print(grid.get_near((0,0)))

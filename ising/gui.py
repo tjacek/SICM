@@ -21,8 +21,11 @@ class GridView(object):
         j= int(point[1]/self.step)
         return i,j 
 
-    def flip(self,point):
-        i,j=self.get_cord(point)
+    def flip(self,point,cord=True):
+        if(cord):
+            i,j=self.get_cord(point)
+        else:
+            i,j=point
         self.grid.array[i][j]*=(-1) 
 
     def flip_near(self,near):
@@ -94,10 +97,13 @@ def exp_loop(in_path:str):
             if event.type == pg.MOUSEBUTTONUP:
                 point = pg.mouse.get_pos()
                 grid_view.flip(point)
-                pair=grid_view.get_cord(point)
+#                pair=grid_view.get_cord(point)
                 print(point)
-                near=grid_view.grid.get_near(pair)
-                grid_view.flip_near(near)
+                pair=grid_view.grid.random()
+                print(pair)
+                grid_view.flip(pair,False)
+#                near=grid_view.grid.get_near(pair)
+#                grid_view.flip_near(near)
         grid_view.show(window)
         pg.display.flip()
         clock.tick(3)
