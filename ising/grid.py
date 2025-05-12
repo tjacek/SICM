@@ -42,6 +42,28 @@ def get_cord(x,max_value):
         cord.append(x+1)
     return cord
 
+class Ising(object):
+    def __init__(self,grid,J=1,T=5):
+        self.grid=grid
+        self.J=J
+        self.T=T
+
+    def b(self,pair):
+        values=self.grid.get_near_values(pair)
+        values=np.array(values)
+        x=self.grid.array[pair]
+        return np.sum(self.J*x*values)
+
+    def step(self):
+        pair_i=self.grid.random()
+        x_i=(-2*self.b(pair_i))/self.T
+        p_i= 1.0/(1.0+np.exp(x_i))
+        if(np.random.uniform()<p_i):
+            self.grid.array[pair_i]= -1
+        else:
+            self.grid.array[pair_i]= -1
+
+
 if __name__ == '__main__':
     grid=Grid()
     grid.randomize()

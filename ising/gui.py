@@ -5,8 +5,9 @@ from enum import Enum
 import grid
 
 class GridView(object):
-    def __init__(self,grid,cells,step=50):
+    def __init__(self,grid,alg,cells,step=50):
         self.grid=grid
+        self.alg=alg
         self.step=step
         self.cells=cells
 
@@ -71,9 +72,11 @@ def make_grid_view(height,
                    step=50):
     raw_grid=grid.Grid(height=height,
                        width=width)
+    alg=grid.Ising(raw_grid)
     raw_grid.randomize()
     return GridView(grid=raw_grid,
                     cells=init_cells(height,width,step),
+                    alg=alg,
                     step=step)
 
 def read_json(in_path):
@@ -87,6 +90,7 @@ def exp_loop(in_path:str):
     grid_view = make_grid_view(height=conf["height"],
                                width=conf["width"],
                                step=conf['step'])
+
     window = pg.display.set_mode(grid_view.display_dim())
     clock = pg.time.Clock()
     run = True
@@ -99,9 +103,10 @@ def exp_loop(in_path:str):
                 grid_view.flip(point)
 #                pair=grid_view.get_cord(point)
                 print(point)
-                pair=grid_view.grid.random()
-                print(pair)
-                grid_view.flip(pair,False)
+                grid_view.alg.step()
+#                pair=grid_view.grid.random()
+#                print(pair)
+#                grid_view.flip(pair,False)
 #                near=grid_view.grid.get_near(pair)
 #                grid_view.flip_near(near)
         grid_view.show(window)
