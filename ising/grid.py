@@ -61,7 +61,7 @@ class Ising(object):
         if(np.random.uniform()<p_i):
             self.grid.array[pair_i]= -1
         else:
-            self.grid.array[pair_i]= -1
+            self.grid.array[pair_i]= 1
 
 
 if __name__ == '__main__':
