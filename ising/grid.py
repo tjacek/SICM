@@ -30,6 +30,11 @@ class Grid(object):
         y=np.random.randint(low=self.width,high=None)
         return x,y
 
+    def iter(self):
+        for i in range(self.height):
+            for j in range(self.width):
+                yield i,j
+
 def get_cord(x,max_value):
     cord=[x]
     if(x<=0):
@@ -63,6 +68,11 @@ class Ising(object):
         else:
             self.grid.array[pair_i]= 1
 
+    def energy(self):
+        total_energy=0
+        for pair_i in self.grid.iter():
+            total_energy+=self.b(pair_i)
+        return -0.5*total_energy
 
 if __name__ == '__main__':
     grid=Grid()
