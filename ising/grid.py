@@ -35,6 +35,15 @@ class Grid(object):
             for j in range(self.width):
                 yield i,j
 
+    def size(self):
+        return np.product(self.array.shape)
+    
+    def flip(self,pair_i,p):
+        if(np.random.uniform()<p):
+            self.array[pair_i]=-1
+        else:
+            self.array[pair_i]= 1
+
 def get_cord(x,max_value):
     cord=[x]
     if(x<=0):
@@ -48,10 +57,16 @@ def get_cord(x,max_value):
     return cord
 
 class Ising(object):
-    def __init__(self,grid,J=1,T=5):
+    def __init__(self,grid,
+                      J=1,
+                      T=5,
+                      sampling=None):
+        if(sampling is None):
+            sampling=GibbsSampling()
         self.grid=grid
         self.J=J
         self.T=T
+        self.sampling=sampling
 
     def b(self,pair):
         values=self.grid.get_near_values(pair)
@@ -61,18 +76,22 @@ class Ising(object):
 
     def step(self):
         pair_i=self.grid.random()
-        x_i=(-2*self.b(pair_i))/self.T
-        p_i= 1.0/(1.0+np.exp(x_i))
-        if(np.random.uniform()<p_i):
-            self.grid.array[pair_i]= -1
-        else:
-            self.grid.array[pair_i]= 1
+        self.sampling(pair_i,self)
 
     def energy(self):
         total_energy=0
         for pair_i in self.grid.iter():
             total_energy+=self.b(pair_i)
         return -0.5*total_energy
+
+class GibbsSampling(object):
+    def __call__(self,pair_i,ising):
+        x_i=(-2*ising.b(pair_i))/ising.T
+        p_i= 1.0/(1.0+np.exp(x_i))
+        ising.grid.flip(pair_i,p_i)
+
+    def __str__(self):
+        return "Gibbs"
 
 if __name__ == '__main__':
     grid=Grid()
