@@ -62,7 +62,7 @@ class Ising(object):
                       T=5,
                       sampling=None):
         if(sampling is None):
-            sampling=GibbsSampling()
+            sampling=MetropolisSampling()
         self.grid=grid
         self.J=J
         self.T=T
@@ -92,6 +92,20 @@ class GibbsSampling(object):
 
     def __str__(self):
         return "Gibbs"
+
+class MetropolisSampling(object):
+    def __call__(self,pair_i,ising):
+        x_i=ising.grid.array[pair_i]
+        b_i=ising.b(pair_i)
+        delta_E=2*x_i*b_i
+        if( delta_E<0):
+            ising.grid.array[pair_i]*=(-1)
+        else:
+            p_i=np.exp(-(delta_E/ising.T))
+            ising.grid.flip(pair_i,p_i)
+
+    def __str__(self):
+        return "Metropolis"
 
 if __name__ == '__main__':
     grid=Grid()
