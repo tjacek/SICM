@@ -1,5 +1,4 @@
 import pygame as pg
-import json
 import numpy as np
 from enum import Enum
 import grid
@@ -79,13 +78,8 @@ def make_grid_view(height,
                     alg=alg,
                     step=step)
 
-def read_json(in_path):
-    with open(in_path, 'r') as file:
-        data = json.load(file)
-        return data
-
 def exp_loop(in_path:str):
-    conf=read_json(in_path)
+    conf=grid.read_json(in_path)
     pg.init()
     grid_view = make_grid_view(height=conf["height"],
                                width=conf["width"],
@@ -115,4 +109,5 @@ def exp_loop(in_path:str):
     pg.quit()
     exit()
 
-exp_loop("conf.js")
+if __name__ == '__main__':
+    exp_loop("conf.js")

@@ -1,3 +1,4 @@
+import json
 import numpy as np
 
 class Grid(object):
@@ -61,8 +62,12 @@ class Ising(object):
                       J=1,
                       T=5,
                       sampling=None):
+        if(type(grid)==tuple):
+            height,width=grid
+            grid=Grid(height=height,
+                      width=width)
         if(sampling is None):
-            sampling=MetropolisSampling()
+            sampling=GibbsSampling()
         self.grid=grid
         self.J=J
         self.T=T
@@ -74,7 +79,7 @@ class Ising(object):
         x=self.grid.array[pair]
         return np.sum(self.J*x*values)
 
-    def step(self):
+    def step(self): 
         pair_i=self.grid.random()
         self.sampling(pair_i,self)
 
@@ -106,6 +111,11 @@ class MetropolisSampling(object):
 
     def __str__(self):
         return "Metropolis"
+
+def read_json(in_path):
+    with open(in_path, 'r') as file:
+        data = json.load(file)
+        return data
 
 if __name__ == '__main__':
     grid=Grid()
