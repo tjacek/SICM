@@ -96,7 +96,7 @@ class GibbsSampling(object):
         ising.grid.flip(pair_i,p_i)
 
     def __str__(self):
-        return "Gibbs"
+        return "gibbs"
 
 class MetropolisSampling(object):
     def __call__(self,pair_i,ising):
@@ -110,7 +110,15 @@ class MetropolisSampling(object):
             ising.grid.flip(pair_i,p_i)
 
     def __str__(self):
-        return "Metropolis"
+        return "metropolis"
+
+def get_sampling(sampling_type:str):
+    sampling_type=sampling_type.lowercase()
+    if(sampling_type=="gibbs"):
+        return GibbsSampling()
+    if(sampling_type=="metropolis"):
+        return MetropolisSampling()    
+    raise Exception(f"Unknown sampling:{sampling_type}")
 
 def read_json(in_path):
     with open(in_path, 'r') as file:
