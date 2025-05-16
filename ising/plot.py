@@ -15,7 +15,7 @@ class Exp(object):
     
     def __call__(self):
         x,y=[],[]
-        n_iters=np.product(self.dims)*self.iter_per_spin
+        n_iters=np.prod(self.dims)*self.iter_per_spin
         for i,model_i in enumerate(self.get_models()):
             model_i.step(n_iters)
             x.append(i)
