@@ -62,7 +62,8 @@ class Ising(object):
                       J=1,
                       T=5,
                       sampling=None):
-        if(type(grid)==tuple):
+        if(type(grid)==tuple or 
+           type(grid)==list):
             height,width=grid
             grid=Grid(height=height,
                       width=width)
@@ -88,7 +89,8 @@ class Ising(object):
         total_energy=0
         for pair_i in self.grid.iter():
             total_energy+=self.b(pair_i)
-        return -0.5*total_energy
+        total_energy*= (-0.5)
+        return total_energy/self.grid.size()
 
 class GibbsSampling(object):
     def __call__(self,pair_i,ising):
@@ -114,7 +116,7 @@ class MetropolisSampling(object):
         return "metropolis"
 
 def get_sampling(sampling_type:str):
-    sampling_type=sampling_type.lowercase()
+    sampling_type=sampling_type.lower()
     if(sampling_type=="gibbs"):
         return GibbsSampling()
     if(sampling_type=="metropolis"):
