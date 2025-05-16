@@ -79,9 +79,10 @@ class Ising(object):
         x=self.grid.array[pair]
         return np.sum(self.J*x*values)
 
-    def step(self): 
-        pair_i=self.grid.random()
-        self.sampling(pair_i,self)
+    def step(self,n_iters): 
+        for i in range(n_iters):
+            pair_i=self.grid.random()
+            self.sampling(pair_i,self)
 
     def energy(self):
         total_energy=0

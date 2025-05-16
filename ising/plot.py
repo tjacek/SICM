@@ -2,7 +2,7 @@ import grid
 
 class Exp(object):
     def __init__(self,dims:tuple,
-                      T:list,
+                      T:float,
                       J:float,
                       sampling:str):
         self.dims=dims
@@ -11,11 +11,13 @@ class Exp(object):
         self.sampling=sampling
 
     def get_models(self):
-    	for T_i in self.T:
-    		ising_i=grid.Ising(grid=self.dims,
+        for T_i in range(self.T):
+            ising_i=grid.Ising(grid=self.dims,
                                J=self.J,
-                               T=self.T,
+                               T=T_i+1,
                                sampling=self.sampling)
+            yield ising_i
+
 def read_exp(in_path):
     conf=grid.read_json(in_path)
     return Exp(dims=conf['dims'],
@@ -23,4 +25,5 @@ def read_exp(in_path):
                J=conf['J'],
                sampling=conf['sampling'])
 
-read_exp("conf_plot.js")
+exp=read_exp("conf_plot.js")
+print(exp.T)
