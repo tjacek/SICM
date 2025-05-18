@@ -1,26 +1,29 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import grid
 
 class Exp(object):
     def __init__(self,dims:tuple,
                       T:float,
                       J:float,
-                      iter_per_spin:int,
                       sampling:str):
         self.dims=dims
         self.T=T
         self.J=J
-        self.iter_per_spin=iter_per_spin
         self.sampling=sampling
     
-    def __call__(self):
+    def __call__(self, iter_per_spin=100):
         x,y=[],[]
-        n_iters=np.prod(self.dims)*self.iter_per_spin
+        n_iters=np.prod(self.dims)*iter_per_spin
         for i,model_i in enumerate(self.get_models()):
             model_i.step(n_iters)
             x.append(i)
             y.append(model_i.energy())
-        print(y)
+        fig, ax = plt.subplots()
+        scatter = ax.plot(x, y)
+        plt.xlabel("T")
+        plt.ylabel("energy")
+        plt.show()
 
     def get_models(self):
         sampling_alg=grid.get_sampling(self.sampling)
@@ -32,6 +35,10 @@ class Exp(object):
             ising_i.grid.randomize()
             yield ising_i
 
+    def __str__(self):
+        width,height=self.dims
+        return f"{self.sampling} {width}x{height}" 
+
 def read_exp(in_path):
     if(type(in_path)==str):
         conf=grid.read_json(in_path)
@@ -40,8 +47,8 @@ def read_exp(in_path):
     return Exp(dims=conf['dims'],
                T=conf['T'],
                J=conf['J'],
-               iter_per_spin=conf['iter_per_spin'],
                sampling=conf['sampling'])
 
 exp=read_exp("conf_plot.js")
-exp()
+print(exp)
+#exp()
