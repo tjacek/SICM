@@ -85,12 +85,12 @@ class Ising(object):
             pair_i=self.grid.random()
             self.sampling(pair_i,self)
 
+    def indiv_energy(self):
+        return [self.b(pair_i) 
+                    for pair_i in self.grid.iter()]
+    
     def energy(self):
-        total_energy=0
-        for pair_i in self.grid.iter():
-            total_energy+=self.b(pair_i)
-        total_energy*= (-0.5)
-        return total_energy/self.grid.size()
+        return (-0.5) * np.mean(self.indiv_energy())
 
 class GibbsSampling(object):
     def __call__(self,pair_i,ising):
