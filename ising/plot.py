@@ -43,7 +43,19 @@ class Exp(object):
                                sampling=sampling_alg)
             ising_i.grid.randomize()
             yield ising_i
-
+    
+    def single_iter(self,T=5,iter_per_spin=100):
+        ising=grid.Ising(grid=self.dims,
+                               J=self.J,
+                               T=T,
+                               sampling=self.sampling)
+        n_iters=ising.n_spins()
+        energy=[]
+        for i in range(n_iters):
+            ising.step()
+            energy_i=ising.energy()
+            energy.append(energy)
+            
     def __str__(self):
         width,height=self.dims
         return f"{self.sampling} {width}x{height}" 

@@ -69,10 +69,15 @@ class Ising(object):
                       width=width)
         if(sampling is None):
             sampling=GibbsSampling()
+        if(type(sampling)==str):
+            sampling=get_sampling(sampling)
         self.grid=grid
         self.J=J
         self.T=T
         self.sampling=sampling
+
+    def n_spins(self):
+        return self.grid.size()
 
     def b(self,pair):
         values=self.grid.get_near_values(pair)
