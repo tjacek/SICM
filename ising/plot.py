@@ -52,10 +52,16 @@ class Exp(object):
         n_iters=ising.n_spins()
         energy=[]
         for i in range(n_iters):
-            ising.step()
+            ising.step(1)
             energy_i=ising.energy()
-            energy.append(energy)
-            
+            energy.append(energy_i)
+        x=list(range(n_iters))
+        fig, ax = plt.subplots()
+        scatter = ax.plot(x, energy)
+        plt.xlabel("n_iters")
+        plt.ylabel("energy")
+        plt.show()           
+    
     def __str__(self):
         width,height=self.dims
         return f"{self.sampling} {width}x{height}" 
@@ -72,4 +78,5 @@ def read_exp(in_path):
 
 exp=read_exp("conf_plot.js")
 #print(exp)
-exp()
+#exp()
+print(exp.single_iter())
