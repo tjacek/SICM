@@ -12,8 +12,7 @@ class Exp(object):
         self.J=J
         self.sampling=sampling
     
-    def __call__(self, iter_per_spin=500):
-        x=[]
+    def __call__(self, iter_per_spin=100):
         n_iters=np.prod(self.dims)*iter_per_spin
         fun_dict={"energy":np.mean,"std":np.std}
         value_dict={name_i:[] for name_i in fun_dict}
@@ -22,17 +21,10 @@ class Exp(object):
             energy= model_i.indiv_energy()
             for name_i,fun_i in fun_dict.items():
                 value_dict[name_i].append(fun_i(energy))
-            x.append(i)
-#            y.append(model_i.energy())
-        def helper(name_i):     
-            y=value_dict[name_i]  
-            fig, ax = plt.subplots()
-            scatter = ax.plot(x, y)
-            plt.xlabel("T")
-            plt.ylabel(name_i)
-            plt.show()
-        helper("energy")
-        helper("std")
+        for name_i,x_i in value_dict.items():
+            simple_plot(x=x_i,
+                    xlabel="T",
+                    ylabel=name_i)
 
     def get_models(self):
         sampling_alg=grid.get_sampling(self.sampling)
@@ -49,18 +41,15 @@ class Exp(object):
                                J=self.J,
                                T=T,
                                sampling=self.sampling)
-        n_iters=ising.n_spins()
+        n_iters=ising.n_spins()*iter_per_spin
         energy=[]
         for i in range(n_iters):
             ising.step(1)
             energy_i=ising.energy()
             energy.append(energy_i)
-        x=list(range(n_iters))
-        fig, ax = plt.subplots()
-        scatter = ax.plot(x, energy)
-        plt.xlabel("n_iters")
-        plt.ylabel("energy")
-        plt.show()           
+        simple_plot(x=energy,
+                    xlabel="n_iters",
+                    ylabel="energy")    
     
     def __str__(self):
         width,height=self.dims
@@ -76,7 +65,20 @@ def read_exp(in_path):
                J=conf['J'],
                sampling=conf['sampling'])
 
+def simple_plot(x,
+                y=None,
+                xlabel="T",
+                ylabel="energy"):
+    if(y is None):
+        y=x
+        x=list(range(len(y)))
+    fig, ax = plt.subplots()
+    scatter = ax.plot(x,y)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.show()
+
 exp=read_exp("conf_plot.js")
 #print(exp)
-#exp()
-print(exp.single_iter())
+exp()
+#print(exp.single_iter())
