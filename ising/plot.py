@@ -6,14 +6,19 @@ class Exp(object):
     def __init__(self,dims:tuple,
                       T:float,
                       J:float,
+                      iter_per_spin:int,
                       sampling:str):
         self.dims=dims
         self.T=T
         self.J=J
+        self.iter_per_spin=iter_per_spin
         self.sampling=sampling
     
-    def __call__(self, iter_per_spin=100):
-        n_iters=np.prod(self.dims)*iter_per_spin
+    def n_iters(self):
+        return np.product(self.dims)*self.iter_per_spin
+
+    def __call__(self):
+        n_iters=self.n_iters()#np.prod(self.dims)*iter_per_spin
         fun_dict={"energy":np.mean,"std":np.std}
         value_dict={name_i:[] for name_i in fun_dict}
         for i,model_i in enumerate(self.get_models()):
@@ -41,7 +46,7 @@ class Exp(object):
                                J=self.J,
                                T=T,
                                sampling=self.sampling)
-        n_iters=ising.n_spins()*iter_per_spin
+        n_iters=self.n_iters()
         energy=[]
         for i in range(n_iters):
             ising.step(1)
@@ -63,6 +68,7 @@ def read_exp(in_path):
     return Exp(dims=conf['dims'],
                T=conf['T'],
                J=conf['J'],
+               iter_per_spin=conf['iter_per_spin'],
                sampling=conf['sampling'])
 
 def simple_plot(x,
