@@ -18,7 +18,7 @@ class Exp(object):
         return np.product(self.dims)*self.iter_per_spin
 
     def __call__(self):
-        n_iters=self.n_iters()#np.prod(self.dims)*iter_per_spin
+        n_iters=self.n_iters()
         fun_dict={"energy":np.mean,"std":np.std}
         value_dict={name_i:[] for name_i in fun_dict}
         for i,model_i in enumerate(self.get_models()):
@@ -55,6 +55,17 @@ class Exp(object):
         simple_plot(x=energy,
                     xlabel="n_iters",
                     ylabel="energy")    
+    
+    def iter_energy(self,ising,burn_out=0.33):
+        n_iters=self.n_iters()
+        energy=[]
+        for i in range(n_iters):
+            ising.step(1)
+            energy_i=ising.energy()
+            energy.append(energy_i)
+        energy=np.array(energy)
+        stable=int(n_iters*burn_out)
+        return energy[stable:]
     
     def __str__(self):
         width,height=self.dims
