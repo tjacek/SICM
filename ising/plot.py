@@ -46,12 +46,7 @@ class Exp(object):
                                J=self.J,
                                T=T,
                                sampling=self.sampling)
-        n_iters=self.n_iters()
-        energy=[]
-        for i in range(n_iters):
-            ising.step(1)
-            energy_i=ising.energy()
-            energy.append(energy_i)
+        energy=self.iter_energy(ising)
         simple_plot(x=energy,
                     xlabel="n_iters",
                     ylabel="energy")    
@@ -97,5 +92,5 @@ def simple_plot(x,
 
 exp=read_exp("conf_plot.js")
 #print(exp)
-exp()
-#print(exp.single_iter())
+#exp()
+print(exp.single_iter())
