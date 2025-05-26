@@ -18,18 +18,26 @@ class Exp(object):
         return np.product(self.dims)*self.iter_per_spin
 
     def __call__(self):
-        n_iters=self.n_iters()
-        fun_dict={"energy":np.mean,"std":np.std}
-        value_dict={name_i:[] for name_i in fun_dict}
+#        fun_dict={"energy":np.mean,"std":np.std}
+#        value_dict={name_i:[] for name_i in fun_dict}
+        energy,std=[],[]
         for i,model_i in enumerate(self.get_models()):
-            model_i.step(n_iters)
-            energy= model_i.indiv_energy()
-            for name_i,fun_i in fun_dict.items():
-                value_dict[name_i].append(fun_i(energy))
-        for name_i,x_i in value_dict.items():
-            simple_plot(x=x_i,
-                    xlabel="T",
-                    ylabel=name_i)
+            print(model_i)
+            energy_i=self.iter_energy(model_i)
+            energy.append(np.mean(energy_i))
+            std.append(np.std(energy_i))
+#            for name_j,fun_j in fun_dict.items():
+#                value_dict[name_j].append(fun_j(energy_i))
+    
+        fig, ax = plt.subplots()
+        ax.errorbar(x=list(range(len(energy))),
+                     y=energy, 
+                     yerr=std, fmt='-o')
+        plt.show()
+#        for name_i,x_i in value_dict.items():
+#            simple_plot(x=x_i,
+#                    xlabel="T",
+#                    ylabel=name_i)
 
     def get_models(self):
         sampling_alg=grid.get_sampling(self.sampling)
@@ -92,5 +100,5 @@ def simple_plot(x,
 
 exp=read_exp("conf_plot.js")
 #print(exp)
-#exp()
-print(exp.single_iter())
+exp()
+#print(exp.single_iter())
