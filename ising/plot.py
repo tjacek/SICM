@@ -18,26 +18,19 @@ class Exp(object):
         return np.product(self.dims)*self.iter_per_spin
 
     def __call__(self):
-#        fun_dict={"energy":np.mean,"std":np.std}
-#        value_dict={name_i:[] for name_i in fun_dict}
         energy,std=[],[]
         for i,model_i in enumerate(self.get_models()):
             print(model_i)
             energy_i=self.iter_energy(model_i)
             energy.append(np.mean(energy_i))
             std.append(np.std(energy_i))
-#            for name_j,fun_j in fun_dict.items():
-#                value_dict[name_j].append(fun_j(energy_i))
-    
         fig, ax = plt.subplots()
         ax.errorbar(x=list(range(len(energy))),
                      y=energy, 
                      yerr=std, fmt='-o')
+        plt.xlabel("T")
+        plt.ylabel("Energy")
         plt.show()
-#        for name_i,x_i in value_dict.items():
-#            simple_plot(x=x_i,
-#                    xlabel="T",
-#                    ylabel=name_i)
 
     def get_models(self):
         sampling_alg=grid.get_sampling(self.sampling)
