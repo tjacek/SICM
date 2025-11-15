@@ -44,6 +44,14 @@ def harmonic1D(k=1.0,m=1.0):
     eq= 0.5*(v[0]**2)-k*(q[0]**2)
     return Langr(q,v,eq)
 
-f=harmonic1D()
-f.d_t()
-#print(f.q[0].name+"_a")
+def orbital():
+    q=make_symbols(['ξ','η'])
+    v=make_symbols(['v_ξ','v_η'])
+    eq= 0.5*(v[0]**2+v[1]**2)
+    eq+= 1/sympy.sqrt(q[0]**2+q[1]**2)
+    return Langr(q,v,eq)    
+
+
+f=orbital()
+#f.d_t()
+print(f.eq)
