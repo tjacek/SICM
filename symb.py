@@ -14,15 +14,19 @@ class Langr(object):
         return [self.eq.diff(v_i)
                  for v_i in self.v]
 
-    def d_t(self):        
-        part=[self.eq.diff(q_i)*self.v[i] 
+    def d_t_v(self):
+        v=self.d_v()
+        return [ self.d_t(v_i) for v_i in v]
+    
+    def d_t(self, eq):        
+        part=[eq.diff(q_i)*self.v[i] 
                 for i,q_i in enumerate(self.q)]
-        part+=[self.eq.diff(v_i)*self.a[i] 
+        part+=[eq.diff(v_i)*self.a[i] 
                 for i,v_i in enumerate(self.v)]
-        eq=part[0]
+        eq_t=part[0]
         for part_i in part[1:]:
-            eq+=part_i
-        print(eq)
+            eq_t+=part_i
+        return eq_t
 
 def derv_var(q):
     return [sympy.symbols(q_i.name+"_a") 
@@ -47,13 +51,17 @@ def harmonic1D(k=1.0,m=1.0):
     return Langr(q,v,eq)
 
 def orbital():
+    u=sympy.symbols("u") 
+    m=sympy.symbols("m") 
     q=make_symbols(['ξ','η'])
     v=make_symbols(['v_ξ','v_η'])
-    eq= 0.5*(v[0]**2+v[1]**2)
-    eq+= 1/sympy.sqrt(q[0]**2+q[1]**2)
+    eq= 0.5*m*(v[0]**2+v[1]**2)
+    eq+= u/sympy.sqrt(q[0]**2+q[1]**2)
     return Langr(q,v,eq)    
 
 
-f=harmonic1D()
+f=orbital()
 #f.d_t()
-print(f.d_t())
+print(f.d_q())
+print(f.d_v())
+print(f.d_t_v())
