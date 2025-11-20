@@ -50,6 +50,17 @@ def harmonic1D(k=1.0,m=1.0):
     eq= 0.5*m*(v[0]**2)-0.5*k*(q[0]**2)
     return Langr(q,v,eq)
 
+def pendulum():
+    q=make_symbols(['θ'])
+    v=make_symbols(['v_θ̇'])
+    u=sympy.symbols("u") 
+    m=sympy.symbols("m")     
+    l=sympy.symbols("l") 
+    g=sympy.symbols("g")
+    eq=0.5*m*l*l*v[0]*v[0]
+    eq+=m*l*g* sympy.cos(v[0])
+    return Langr(q,v,eq)
+
 def orbital():
     u=sympy.symbols("u") 
     m=sympy.symbols("m") 
@@ -60,7 +71,7 @@ def orbital():
     return Langr(q,v,eq)    
 
 
-f=orbital()
+f=pendulum()
 #f.d_t()
 print(f.d_q())
 print(f.d_v())
