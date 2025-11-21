@@ -28,6 +28,11 @@ class Langr(object):
             eq_t+=part_i
         return eq_t
 
+    def curry(self,path):
+        v=path.diff("t")
+        rep_vars=[("x",path),("v",v)]
+        return self.eq.subs(rep_vars)
+
 def derv_var(q):
     return [sympy.symbols(q_i.name+"_a") 
                for q_i in q]
@@ -71,8 +76,12 @@ def orbital():
     return Langr(q,v,eq)    
 
 
-f=pendulum()
+f=harmonic1D()
+t=sympy.symbols("t") 
+path= 3*t+5
+print(f.curry(path))
+
 #f.d_t()
-print(f.d_q())
-print(f.d_v())
-print(f.d_t_v())
+#print(f.d_q())
+#print(f.d_v())
+#print(f.d_t_v())
