@@ -33,6 +33,15 @@ class Langr(object):
         rep_vars=[("x",path),("v",v)]
         return self.eq.subs(rep_vars)
 
+class Path(object):
+    def __init__(self,cord_eqs):
+        self.x_cord=cord_eqs
+        self.v_cord=[x_i.diff("t") 
+                for x_i in self.x_cord]
+
+    def dims(self):
+        return len(self.x_cord)
+
 def derv_var(q):
     return [sympy.symbols(q_i.name+"_a") 
                for q_i in q]
