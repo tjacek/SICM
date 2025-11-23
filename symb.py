@@ -42,6 +42,14 @@ class Path(object):
     def dims(self):
         return len(self.x_cord)
 
+    def curry(self,langr):
+        q_names=[q_i.name for q_i in langr.q]
+        rep_vars=list(zip(q_names,self.x_cord))
+        v_names=[v_i.name for v_i in langr.v]
+        rep_vars+=list(zip(v_names,self.v_cord))
+        return self.eq.subs(rep_vars)
+
+
 def derv_var(q):
     return [sympy.symbols(q_i.name+"_a") 
                for q_i in q]
