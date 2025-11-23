@@ -34,6 +34,7 @@ class Langr(object):
         return self.eq.subs(rep_vars)
 
 class Path(object):
+    t=sympy.symbols("t")
     def __init__(self,cord_eqs):
         self.x_cord=cord_eqs
         self.v_cord=[x_i.diff("t") 
@@ -47,7 +48,15 @@ class Path(object):
         rep_vars=list(zip(q_names,self.x_cord))
         v_names=[v_i.name for v_i in langr.v]
         rep_vars+=list(zip(v_names,self.v_cord))
-        return self.eq.subs(rep_vars)
+        return langr.eq.subs(rep_vars)
+
+    def action(self,langr,lim=None):
+        f=self.curry(langr)
+        if(lim is None):
+            return sympy.integrate(f,self.t)
+        else:
+            t_0,t_1=lim
+            return  sympy.integrate(f,(self.t,t_0,t_1))
 
 
 def derv_var(q):
@@ -94,9 +103,11 @@ def orbital():
 
 
 f=harmonic1D()
-t=sympy.symbols("t") 
-path= 3*t+5
-print(f.curry(path))
+ 
+#path= 3*t+5
+path=Path([sympy.sin(Path.t)])
+
+print(path.action(f,(0,2*3.14)))
 
 #f.d_t()
 #print(f.d_q())
