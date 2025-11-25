@@ -14,9 +14,9 @@ class Langr(object):
         return [self.eq.diff(v_i)
                  for v_i in self.v]
 
-    def d_t_v(self):
-        v=self.d_v()
-        return [ self.d_t(v_i) for v_i in v]
+#    def d_t_v(self):
+#        v=self.d_v()
+#        return [ self.d_t(v_i) for v_i in v]
     
     def d_t(self, eq):        
         part=[eq.diff(q_i)*self.v[i] 
@@ -101,15 +101,17 @@ def orbital():
     eq+= u/sympy.sqrt(q[0]**2+q[1]**2)
     return Langr(q,v,eq)    
 
+def harmonic_path():
+    A=sympy.symbols("A") 
+    w=sympy.symbols("ω")
+    theta=sympy.symbols("θ")    
+    return Path([A*sympy.cos(w*Path.t + theta)])
 
-f=harmonic1D()
+print(harmonic_path().x_cord)
+
+#f=harmonic1D()
  
 #path= 3*t+5
-path=Path([sympy.sin(Path.t)])
 
-print(path.action(f,(0,2*3.14)))
 
-#f.d_t()
-#print(f.d_q())
-#print(f.d_v())
-#print(f.d_t_v())
+#print(path.action(f,(0,2*3.14)))
