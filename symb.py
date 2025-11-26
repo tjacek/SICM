@@ -33,21 +33,27 @@ class Langr(object):
         rep_vars=[("x",path),("v",v)]
         return self.eq.subs(rep_vars)
 
+
 class Path(object):
     t=sympy.symbols("t")
     def __init__(self,cord_eqs):
-        self.x_cord=cord_eqs
-        self.v_cord=[x_i.diff("t") 
-                for x_i in self.x_cord]
+        self.q=cord_eqs
+        self.v=None
 
+    def get_v(self):
+        if(self.v_cord is None):
+            self.v=[q_i.diff("t") 
+                    for q_i in self.x]
+        return self.v
+    
     def dims(self):
-        return len(self.x_cord)
+        return len(self.x)
 
-    def curry(self,langr):
+    def curry_lang(self,langr):
         q_names=[q_i.name for q_i in langr.q]
-        rep_vars=list(zip(q_names,self.x_cord))
+        rep_vars=list(zip(q_names,self.q))
         v_names=[v_i.name for v_i in langr.v]
-        rep_vars+=list(zip(v_names,self.v_cord))
+        rep_vars+=list(zip(v_names,self.get_v()))
         return langr.eq.subs(rep_vars)
 
     def action(self,langr,lim=None):
@@ -107,7 +113,7 @@ def harmonic_path():
     theta=sympy.symbols("θ")    
     return Path([A*sympy.cos(w*Path.t + theta)])
 
-print(harmonic_path().x_cord)
+print(type(list(harmonic_path().q[0].free_symbols)[0]))
 
 #f=harmonic1D()
  

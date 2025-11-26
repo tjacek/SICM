@@ -1,33 +1,47 @@
 import numpy as np
+import sympy
 
-class Langrange(object):
-    def __init__(self,fun):
-        self.fun=fun
+class Langrange1D(object):
+    def __init__(self,q,v,eq):
+        self.q=q
+        self.v=v
+        self.eq=eq
 
-    def __call__(self,path,step=0.01):
-        values=path.whole(step)
-        return np.sum([self.fun(*value_i) 
-                      for value_i in values])
-
-class Free(object):
-    def __call__(self,q,v):
-        return 0.5*np.dot(v,v)
-
-    def diff_q(self,q,v):
-        return 0
-
-    def diff_v(self,q,v):
-        return np.sum(v)	
-
-class Harmonic(object):
-    def __init__(self,k=1):
-        self.k=k 
-
-    def __call__(self,q,v):
-        return 0.5*(np.dot(v,v) - self.k*np.dot(q,q))
-
-    def diff_q(self,q,v):
-    	return np.sum(q)
+    def d_x(self):
+        return self.eq.diff(self.q)
     
-    def diff_v(self,q,v):
-    	return np.sum(v)
+    def d_v(self):
+        return self.eq.diff(self.v)
+
+    def langr_euler(self,path):
+        d_x= path.curry(self.d_x())
+        d_v_t= path.curry(self.d_v()).diff("t")
+        return d_x - d_v_t
+
+class Path1D(object):
+    t=sympy.symbols("t")
+    def __init__(self,q):
+        self.q=q
+        self.v=q.diff("t")
+
+    def curry(self,eq):
+        rep_vars=[("q",self.q),("v",self.v)]
+        return eq.subs(rep_vars)
+
+def harmonic_path():
+    A=sympy.symbols("A") 
+    w=sympy.symbols("ω")
+    theta=sympy.symbols("θ")    
+    return Path1D(A*sympy.cos(w*Path1D.t + theta))
+
+def harmonic_langr():
+    k=sympy.symbols("k") 
+    m=sympy.symbols("m") 
+    q=sympy.symbols('q')
+    v=sympy.symbols('v')
+    eq= 0.5*m*(v**2)-0.5*k*(q**2)
+    return Langrange1D(q,v,eq)
+
+path=harmonic_path()
+L=harmonic_langr()
+print(L.langr_euler(path))
