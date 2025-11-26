@@ -18,6 +18,14 @@ class Langrange1D(object):
         d_v_t= path.curry(self.d_v()).diff("t")
         return d_x - d_v_t
 
+    def action(self,path,lim=None):
+        f=path.curry(langr)
+        if(lim is None):
+            return sympy.integrate(f,self.t)
+        else:
+            t_0,t_1=lim
+            return  sympy.integrate(f,(self.t,t_0,t_1))
+
 class Path1D(object):
     t=sympy.symbols("t")
     def __init__(self,q):
