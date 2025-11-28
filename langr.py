@@ -42,12 +42,24 @@ def harmonic_path():
     theta=sympy.symbols("θ")    
     return Path1D(A*sympy.cos(w*Path1D.t + theta))
 
+def linear_path():
+    a=sympy.symbols("a") 
+    b=sympy.symbols("b")    
+    return Path1D(A*sympy.cos(a*Path1D.t + b))
+
 def harmonic_langr():
     k=sympy.symbols("k") 
     m=sympy.symbols("m") 
     q=sympy.symbols('q')
     v=sympy.symbols('v')
     eq= 0.5*m*(v**2)-0.5*k*(q**2)
+    return Langrange1D(q,v,eq)
+
+def linear_langr():
+    m=sympy.symbols("m") 
+    q=sympy.symbols('q')
+    v=sympy.symbols('v')
+    eq= 0.5*m*(v**2)
     return Langrange1D(q,v,eq)
 
 path=harmonic_path()
