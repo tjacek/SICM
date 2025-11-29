@@ -62,6 +62,15 @@ def linear_langr():
     eq= 0.5*m*(v**2)
     return Langrange1D(q,v,eq)
 
+def gravity_langr():
+    m=sympy.symbols("m") 
+    g=sympy.symbols("g") 
+
+    q=sympy.symbols('q')
+    v=sympy.symbols('v')
+    eq= 0.5*m*(v**2)-m*g*x
+    return Langrange1D(q,v,eq)
+
 path=harmonic_path()
 L=harmonic_langr()
 print(L.langr_euler(path))
