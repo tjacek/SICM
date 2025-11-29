@@ -6,6 +6,12 @@ class Langrange1D(object):
         self.q=q
         self.v=v
         self.eq=eq
+    
+    def derv(self ,derv_vars):
+        syb_var=self.eq
+        for var_i in derv_vars:
+            syb_var=syb_var.diff(var_i)
+        return syb_var
 
     def d_x(self):
         return self.eq.diff(self.q)
