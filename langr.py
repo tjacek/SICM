@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import sympy
 
 class Langrange1D(object):
@@ -41,6 +42,14 @@ class Path1D(object):
     def curry(self,eq):
         rep_vars=[("q",self.q),("v",self.v)]
         return eq.subs(rep_vars)
+    
+    def plot_x(self, n=100,step=0.1):
+        t=[ step*i for i in range(n)]
+        x=[self.q(t) for t_i in t]
+        plt.plot(t,x)
+        plt.ylabel('x')
+        plt.xlabel('t')
+        plt.show()
 
 def harmonic_path():
     A=sympy.symbols("A") 
