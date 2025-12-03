@@ -45,13 +45,23 @@ class Path1D(object):
         return eq.subs(rep_vars)
     
     def plot_x(self, n=100,step=0.1):
+        self.plot(self.q,"x",n,step)
+    
+    def plot_v(self, n=100,step=0.1):
+        self.plot(self.v,"v",n,step)
+    
+    def plot( self,
+              eq,
+              ylabel="x",
+              n=100,
+              step=0.1):
         t=[ step*i for i in range(n)]
-        eq=self.q.subs(self.defaults)
+        if(self.defaults):
+            eq=eq.subs(self.defaults)
         x=[eq.subs(self.t, t_i) 
             for t_i in t]
-        print(x)
         plt.plot(t,x)
-        plt.ylabel('x')
+        plt.ylabel(ylabel)
         plt.xlabel('t')
         plt.show()
 
@@ -60,13 +70,13 @@ def harmonic_path():
     w=sympy.symbols("ω")
     theta=sympy.symbols("θ")
     q= A*sympy.cos(w*Path1D.t) + theta
-#    [(A,1),(w,1),(theta,0)]
     return Path1D(q,{"A":1,"ω":1,"θ":0})
 
 def linear_path():
     a=sympy.symbols("a") 
     b=sympy.symbols("b")    
-    return Path1D(A*sympy.cos(a*Path1D.t + b))
+    q=a*Path1D.t + b
+    return Path1D(q,{"a":1,"b":1})
 
 def harmonic_langr():
     k=sympy.symbols("k") 
@@ -92,7 +102,9 @@ def gravity_langr():
     eq= 0.5*m*(v**2)-m*g*x
     return Langrange1D(q,v,eq)
 
-path=harmonic_path()
+path=linear_path()
 path.plot_x()
+path.plot_v()
+
 #L=harmonic_langr()
 #print(L.langr_euler(path))
