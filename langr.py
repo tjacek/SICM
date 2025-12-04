@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 import sympy
 
 class Langrange1D(object):
-    def __init__(self,q,v,eq):
+    def __init__(self,q,v,eq,defaults=None):
         self.q=q
         self.v=v
         self.eq=eq
+        self.defaults=defaults
     
     def derv(self ,derv_vars):
         syb_var=self.eq
@@ -32,6 +33,22 @@ class Langrange1D(object):
         else:
             t_0,t_1=lim
             return  sympy.integrate(f,(self.t,t_0,t_1))
+
+    def plot(self,lim_q=(-100,100),lim_v=(-100,100),steps=64):
+        q_lin=np.linspace(lim_q[0], lim_q[1], steps)
+        v_lin=np.linspace(lim_v[0], lim_v[1], steps)
+        z_eq=self.eq.subs(self.defaults) 
+        Z=[[float(z_eq.subs([("q",q_i),("v",v_i)]))
+             for q_i in q_lin]
+                 for v_i in v_lin  ] 
+        Z=np.array(Z)
+        X, Y = np.meshgrid(q_lin, v_lin)
+        levels = np.linspace(np.min(Z),np.max(Z),10)
+        fig, ax = plt.subplots()
+        ax.contour(X, Y, Z, levels=levels)
+        plt.xlabel("q")
+        plt.xlabel("v")
+        plt.show()
 
 class Path1D(object):
     t=sympy.symbols("t")
@@ -84,14 +101,16 @@ def harmonic_langr():
     q=sympy.symbols('q')
     v=sympy.symbols('v')
     eq= 0.5*m*(v**2)-0.5*k*(q**2)
-    return Langrange1D(q,v,eq)
+    defaults={"k":1,"m":2}
+    return Langrange1D(q,v,eq,defaults)
 
 def linear_langr():
     m=sympy.symbols("m") 
     q=sympy.symbols('q')
     v=sympy.symbols('v')
     eq= 0.5*m*(v**2)
-    return Langrange1D(q,v,eq)
+    defaults={"m":2}
+    return Langrange1D(q,v,eq,defaults)
 
 def gravity_langr():
     m=sympy.symbols("m") 
@@ -102,9 +121,22 @@ def gravity_langr():
     eq= 0.5*m*(v**2)-m*g*x
     return Langrange1D(q,v,eq)
 
-path=linear_path()
-path.plot_x()
-path.plot_v()
+print(np.linspace(-3, 3, 16))
 
-#L=harmonic_langr()
+#path=linear_path()
+#path.plot_x()
+#path.plot_v()
+L=linear_langr()
+L.plot()
 #print(L.langr_euler(path))
+
+
+
+#X, Y = np.meshgrid(np.linspace(-3, 3, 16), np.linspace(-3, 3, 16))
+#Z = (1 - X/2 + X**5 + Y**3) * np.exp(-X**2 - Y**2)
+#levels = np.linspace(np.min(Z), np.max(Z), 7)
+#fig, ax = plt.subplots()
+
+#ax.contour(X, Y, Z, levels=levels)
+
+#plt.show()
