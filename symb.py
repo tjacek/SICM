@@ -113,11 +113,8 @@ def harmonic_path():
     theta=sympy.symbols("θ")    
     return Path([A*sympy.cos(w*Path.t + theta)])
 
-print(type(list(harmonic_path().q[0].free_symbols)[0]))
-
+#print(type(list(harmonic_path().q[0].free_symbols)[0]))
 #f=harmonic1D()
- 
 #path= 3*t+5
-
-
 #print(path.action(f,(0,2*3.14)))
+
