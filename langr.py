@@ -50,6 +50,9 @@ class Langrange1D(object):
         plt.xlabel("v")
         plt.show()
 
+    def __str__(self):
+        return str(self.eq)
+
 class Path1D(object):
     t=sympy.symbols("t")
     def __init__(self,q,defaults=None):
@@ -121,22 +124,13 @@ def gravity_langr():
     eq= 0.5*m*(v**2)-m*g*x
     return Langrange1D(q,v,eq)
 
-print(np.linspace(-3, 3, 16))
+#print(np.linspace(-3, 3, 16))
 
 #path=linear_path()
 #path.plot_x()
 #path.plot_v()
-L=linear_langr()
-L.plot()
+#L=linear_langr()
+#L.plot()
 #print(L.langr_euler(path))
-
-
-
-#X, Y = np.meshgrid(np.linspace(-3, 3, 16), np.linspace(-3, 3, 16))
-#Z = (1 - X/2 + X**5 + Y**3) * np.exp(-X**2 - Y**2)
-#levels = np.linspace(np.min(Z), np.max(Z), 7)
-#fig, ax = plt.subplots()
-
-#ax.contour(X, Y, Z, levels=levels)
-
-#plt.show()
+L=harmonic_langr()
+print(L)
