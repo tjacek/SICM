@@ -8,16 +8,18 @@ class Quaternion(object):
         self.d=d
 
     def to_matrix(self):
-        arr=[[ complex(a,b),complex(c,d)],
-             [complex(-c,d),complex(a,-b)]]
+        arr=[[ complex(self.a,self.b),
+               complex(self.c,self.d)],
+             [ complex(-self.c,self.d),
+              complex(self.a,-self.b)]]
         return np.array(arr)
     
     @staticmethod
-    def from_matrix(self,arr)
-        a=self.arr[0][0].real
-        b=self.arr[0][0].imag
-        c=self.arr[0][1].real
-        d=self.arr[0][1].imag
+    def from_matrix(arr):
+        a=arr[0][0].real
+        b=arr[0][0].imag
+        c=arr[0][1].real
+        d=arr[0][1].imag
         return a,b,c,d
 
     def __mul__(self,q):
