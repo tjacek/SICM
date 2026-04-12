@@ -35,6 +35,11 @@ class Quaternion(object):
                           self.c+q.c, 
                           self.d+q.d )
     
+    def __sub__(self,q):
+        return Quaternion(self.a-q.a, 
+                          self.b-q.b, 
+                          self.c-q.c, 
+                          self.d-q.d )
     def __repr__(self):
         return f"{self.a},{self.b},{self.c},{self.d}"
 
@@ -44,4 +49,4 @@ k=Quaternion(d=1)
 print(i*i)
 print(j*j)
 print(k*k)
-print(i+j)
+print(i*j-j*i)
