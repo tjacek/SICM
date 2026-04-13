@@ -7,6 +7,9 @@ class Quaternion(object):
         self.c=c
         self.d=d
 
+    def to_list(self):
+        return [self.a,self.b,self.c,self.d]
+
     def to_matrix(self):
         arr=[[ complex(self.a,self.b),
                complex(self.c,self.d)],
@@ -42,6 +45,12 @@ class Quaternion(object):
                           self.d-q.d )
     def __repr__(self):
         return f"{self.a},{self.b},{self.c},{self.d}"
+
+    def norm(self):
+        total=0
+        for x in self.to_list():
+            total+= x**2
+        return total
 
 i=Quaternion(b=1)
 j=Quaternion(c=1)
