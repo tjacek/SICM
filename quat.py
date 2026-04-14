@@ -52,10 +52,17 @@ class Quaternion(object):
             total+= x**2
         return total
 
+def cross_product(a,b):
+    return [a[1]*b[2] - a[2]*b[1],
+            a[2]*b[0] - a[0]*b[2],
+            a[0]*b[1]-a[1]*b[0]]
+
+
 i=Quaternion(b=1)
 j=Quaternion(c=1)
 k=Quaternion(d=1)
 print(i*i)
 print(j*j)
 print(k*k)
-print(i*j-j*i)
+q=i*j-j*i
+print(q.norm())
